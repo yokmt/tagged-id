@@ -1,17 +1,17 @@
-use ::diesel::{Expression, Queryable};
 use ::diesel::backend::Backend;
 use ::diesel::deserialize;
 use ::diesel::deserialize::FromSqlRow;
-use ::diesel::expression::AsExpression;
 use ::diesel::expression::bound::Bound;
+use ::diesel::expression::AsExpression;
 use ::diesel::row::Row;
+use ::diesel::{Expression, Queryable};
 
 use super::*;
 
 impl<DB, In, ST> Queryable<ST, DB> for TaggedId<In>
-    where
-        DB: Backend,
-        TaggedId<In>: FromSqlRow<ST, DB>
+where
+    DB: Backend,
+    TaggedId<In>: FromSqlRow<ST, DB>,
 {
     type Row = Self;
 
@@ -21,8 +21,8 @@ impl<DB, In, ST> Queryable<ST, DB> for TaggedId<In>
 }
 
 impl<DB: Backend, In, ST> FromSqlRow<ST, DB> for TaggedId<In>
-    where
-        String: FromSqlRow<ST, DB>
+where
+    String: FromSqlRow<ST, DB>,
 {
     fn build_from_row<T: Row<DB>>(row: &mut T) -> deserialize::Result<Self> {
         let str = String::build_from_row(row)?;
@@ -31,8 +31,8 @@ impl<DB: Backend, In, ST> FromSqlRow<ST, DB> for TaggedId<In>
 }
 
 impl<T, ST> AsExpression<ST> for TaggedId<T>
-    where
-        Bound<ST, String>: Expression<SqlType=ST>
+where
+    Bound<ST, String>: Expression<SqlType = ST>,
 {
     type Expression = Bound<ST, String>;
 
@@ -42,8 +42,8 @@ impl<T, ST> AsExpression<ST> for TaggedId<T>
 }
 
 impl<'a, T, ST> AsExpression<ST> for &'a TaggedId<T>
-    where
-        Bound<ST, String>: Expression<SqlType=ST>
+where
+    Bound<ST, String>: Expression<SqlType = ST>,
 {
     type Expression = Bound<ST, String>;
 
