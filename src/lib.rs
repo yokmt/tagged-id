@@ -3,6 +3,7 @@ use std::marker::PhantomData;
 use std::str::FromStr;
 
 use thiserror::Error;
+pub use uuid::Bytes;
 use uuid::Uuid;
 
 #[cfg(feature = "diesel")]
@@ -20,12 +21,20 @@ impl<T> TaggedId<T> {
         TaggedId::from_uuid(Uuid::new_v4())
     }
 
+    pub fn from_bytes(bytes: Bytes) -> Self {
+        TaggedId::from_uuid(Uuid::from_bytes(bytes))
+    }
+
     pub fn from_slice(b: &[u8]) -> Result<Self, Error> {
         Ok(TaggedId::from_uuid(Uuid::from_slice(b)?))
     }
 
     pub fn parse_str(s: &str) -> Result<Self, Error> {
         Ok(TaggedId::from_uuid(Uuid::parse_str(s)?))
+    }
+
+    pub fn as_bytes(&self) -> &Bytes {
+        self.inner.as_bytes()
     }
 
     fn from_uuid(id: Uuid) -> Self {
