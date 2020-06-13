@@ -2,15 +2,14 @@ use core::fmt;
 use std::marker::PhantomData;
 use std::str::FromStr;
 
-use uuid::Uuid;
 use thiserror::Error;
+use uuid::Uuid;
 
 #[cfg(feature = "diesel")]
 mod diesel;
 #[cfg(feature = "serde")]
 mod serde;
 
-#[derive(Debug)]
 pub struct TaggedId<T> {
     inner: Uuid,
     _phantom: PhantomData<T>,
@@ -60,6 +59,12 @@ impl<T> fmt::Display for TaggedId<T> {
     }
 }
 
+impl<T> fmt::Debug for TaggedId<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
+        Uuid::fmt(&self.inner, f)
+    }
+}
+
 impl<T> PartialEq for TaggedId<T> {
     fn eq(&self, other: &Self) -> bool {
         self.inner == other.inner
@@ -78,7 +83,6 @@ pub struct Error(#[from] uuid::Error);
 mod tests {
     use super::*;
 
-    #[derive(Debug)]
     struct MyTag;
 
     type MyId = TaggedId<MyTag>;
