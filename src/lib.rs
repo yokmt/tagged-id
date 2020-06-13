@@ -20,17 +20,19 @@ impl<T> TaggedId<T> {
         TaggedId::from_uuid(Uuid::new_v4())
     }
 
-    pub fn from_uuid(id: Uuid) -> Self {
+    pub fn from_slice(b: &[u8]) -> Result<Self, Error> {
+        Ok(TaggedId::from_uuid(Uuid::from_slice(b)?))
+    }
+
+    pub fn parse_str(s: &str) -> Result<Self, Error> {
+        Ok(TaggedId::from_uuid(Uuid::parse_str(s)?))
+    }
+
+    fn from_uuid(id: Uuid) -> Self {
         Self {
             inner: id,
             _phantom: PhantomData,
         }
-    }
-
-    pub fn parse_str(s: &str) -> Result<Self, Error> {
-        let uuid = Uuid::parse_str(s)
-            .map_err(Error)?;
-        Ok(TaggedId::from_uuid(uuid))
     }
 }
 
