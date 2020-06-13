@@ -1,4 +1,6 @@
 use core::fmt;
+use std::cmp::Ordering;
+use std::hash::{Hash, Hasher};
 use std::marker::PhantomData;
 use std::str::FromStr;
 
@@ -11,6 +13,7 @@ mod diesel;
 #[cfg(feature = "serde")]
 mod serde;
 
+#[derive(Eq, Ord)]
 pub struct TaggedId<T> {
     inner: Uuid,
     _phantom: PhantomData<T>,
@@ -80,9 +83,17 @@ impl<T> PartialEq for TaggedId<T> {
     fn eq(&self, other: &Self) -> bool {
         self.inner == other.inner
     }
+}
 
-    fn ne(&self, other: &Self) -> bool {
-        self.inner != other.inner
+impl<T> PartialOrd for TaggedId<T> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.inner.partial_cmp(&other.inner)
+    }
+}
+
+impl<T> Hash for TaggedId<T> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.inner.hash(state)
     }
 }
 
@@ -119,12 +130,31 @@ mod tests {
     #[test]
     fn fmt_display() {
         let id = MyId::parse_str("12345678-1111-1111-1111-111111111111").unwrap();
-        assert_eq!("12345678-1111-1111-1111-111111111111", format!("{}", id))
+        assert_eq!("12345678-1111-1111-1111-111111111111", format!("{}", id));
+        assert_eq!("12345678-1111-1111-1111-111111111111", format!("{:?}", id));
     }
 
     #[test]
     fn to_string() {
         let id = MyId::parse_str("12345678-1111-1111-1111-111111111111").unwrap();
         assert_eq!("12345678-1111-1111-1111-111111111111", id.to_string())
+    }
+
+    #[test]
+    fn hash() {
+        use std::collections::hash_map::DefaultHasher;
+        let id1 = MyId::parse_str("12345678-1111-1111-1111-111111111111").unwrap();
+        let id2 = MyId::parse_str("12345678-1111-1111-1111-111111111111").unwrap();
+
+        let mut h1 = DefaultHasher::new();
+        let mut h2 = DefaultHasher::new();
+        id1.hash(&mut h1);
+        id2.hash(&mut h2);
+        assert_eq!(h1.finish(), h2.finish());
+
+        let id3 = MyId::parse_str("12345678-1111-1111-1111-222222222222").unwrap();
+        let mut h3 = DefaultHasher::new();
+        id3.hash(&mut h3);
+        assert_ne!(h1.finish(), h3.finish());
     }
 }
