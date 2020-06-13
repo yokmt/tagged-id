@@ -3,6 +3,7 @@ use std::marker::PhantomData;
 use std::str::FromStr;
 
 use uuid::Uuid;
+use thiserror::Error;
 
 #[cfg(feature = "diesel")]
 mod diesel;
@@ -15,11 +16,7 @@ pub struct TaggedId<T> {
     _phantom: PhantomData<T>,
 }
 
-#[derive(Debug)]
-pub struct Error(uuid::Error);
-
 impl<T> TaggedId<T> {
-
     pub fn new() -> Self {
         TaggedId::from_uuid(Uuid::new_v4())
     }
@@ -36,7 +33,6 @@ impl<T> TaggedId<T> {
             .map_err(Error)?;
         Ok(TaggedId::from_uuid(uuid))
     }
-
 }
 
 impl<T> FromStr for TaggedId<T> {
@@ -73,6 +69,10 @@ impl<T> PartialEq for TaggedId<T> {
         self.inner != other.inner
     }
 }
+
+#[derive(Debug, Error)]
+#[error("TaggedId Error {0}")]
+pub struct Error(#[from] uuid::Error);
 
 #[cfg(test)]
 mod tests {

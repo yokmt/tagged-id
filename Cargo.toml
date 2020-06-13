@@ -4,11 +4,20 @@ version = "0.1.0"
 authors = ["Yusuke Okamoto <y.okamoto@accelia.net>"]
 edition = "2018"
 
+[features]
+default = []
+
+serde = ["use_serde", "uuid/serde"]
+
+[dependencies]
+thiserror = "1.0"
+
 [dependencies.uuid]
 version = "0.8"
 features = ["v4"]
 
-[dependencies.serde]
+[dependencies.use_serde]
+package = "serde"
 version = "1.0"
 optional = true
 

@@ -1,8 +1,10 @@
-use diesel::{Expression, Queryable};
-use diesel::backend::Backend;
-use diesel::deserialize::FromSqlRow;
-use diesel::expression::AsExpression;
-use diesel::expression::bound::Bound;
+use ::diesel::{Expression, Queryable};
+use ::diesel::backend::Backend;
+use ::diesel::deserialize;
+use ::diesel::deserialize::FromSqlRow;
+use ::diesel::expression::AsExpression;
+use ::diesel::expression::bound::Bound;
+use ::diesel::row::Row;
 
 use super::*;
 
@@ -22,10 +24,9 @@ impl<DB: Backend, In, ST> FromSqlRow<ST, DB> for TaggedId<In>
     where
         String: FromSqlRow<ST, DB>
 {
-    fn build_from_row<T: diesel::row::Row<DB>>(row: &mut T) -> diesel::deserialize::Result<Self> {
+    fn build_from_row<T: Row<DB>>(row: &mut T) -> deserialize::Result<Self> {
         let str = String::build_from_row(row)?;
-        let id = Uuid::parse_str(&str)?;
-        Ok(TaggedId::from_uuid(id))
+        Ok(TaggedId::parse_str(&str)?)
     }
 }
 
@@ -36,7 +37,7 @@ impl<T, ST> AsExpression<ST> for TaggedId<T>
     type Expression = Bound<ST, String>;
 
     fn as_expression(self) -> Self::Expression {
-        Bound::new(self.inner().to_string())
+        Bound::new(self.to_string())
     }
 }
 
@@ -47,6 +48,6 @@ impl<'a, T, ST> AsExpression<ST> for &'a TaggedId<T>
     type Expression = Bound<ST, String>;
 
     fn as_expression(self) -> Self::Expression {
-        Bound::new(self.inner().to_string())
+        Bound::new(self.to_string())
     }
 }

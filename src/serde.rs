@@ -1,4 +1,4 @@
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use use_serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 
 use super::*;
 
@@ -13,7 +13,7 @@ impl<'de, T> Deserialize<'de> for TaggedId<T> {
         Uuid::deserialize(deserializer)
             .map(TaggedId::from_uuid)
             .map_err(|_| {
-                serde::de::Error::custom("Invalid id format")
+                de::Error::custom("Invalid id format")
             })
     }
 }
