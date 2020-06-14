@@ -13,7 +13,6 @@ mod diesel;
 #[cfg(feature = "serde")]
 mod serde;
 
-#[derive(Eq, Ord)]
 pub struct TaggedId<T> {
     inner: Uuid,
     _phantom: PhantomData<T>,
@@ -79,9 +78,17 @@ impl<T> fmt::Debug for TaggedId<T> {
     }
 }
 
+impl<T> Eq for TaggedId<T> {}
+
 impl<T> PartialEq for TaggedId<T> {
     fn eq(&self, other: &Self) -> bool {
         self.inner == other.inner
+    }
+}
+
+impl<T> Ord for TaggedId<T> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.inner.cmp(&other.inner)
     }
 }
 
