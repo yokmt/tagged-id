@@ -19,6 +19,7 @@ pub struct TaggedId<T> {
 }
 
 impl<T> TaggedId<T> {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         TaggedId::from_uuid(Uuid::new_v4())
     }
