@@ -5,13 +5,14 @@ use std::marker::PhantomData;
 use std::str::FromStr;
 
 use thiserror::Error;
-pub use uuid::Bytes;
 use uuid::Uuid;
 
 #[cfg(feature = "diesel")]
 mod diesel;
 #[cfg(feature = "serde")]
 mod serde;
+
+pub type Bytes = uuid::Bytes;
 
 pub struct TaggedId<T> {
     inner: Uuid,

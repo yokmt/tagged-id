@@ -1,17 +1,17 @@
-use ::diesel::backend::Backend;
-use ::diesel::deserialize;
-use ::diesel::deserialize::FromSqlRow;
-use ::diesel::expression::bound::Bound;
-use ::diesel::expression::AsExpression;
-use ::diesel::row::Row;
-use ::diesel::{Expression, Queryable};
+use diesel::backend::Backend;
+use diesel::deserialize;
+use diesel::deserialize::FromSqlRow;
+use diesel::expression::bound::Bound;
+use diesel::expression::AsExpression;
+use diesel::row::Row;
+use diesel::{Expression, Queryable};
 
-use super::*;
+use super::TaggedId;
 
-impl<DB, In, ST> Queryable<ST, DB> for TaggedId<In>
+impl<T, DB, ST> Queryable<ST, DB> for TaggedId<T>
 where
     DB: Backend,
-    TaggedId<In>: FromSqlRow<ST, DB>,
+    TaggedId<T>: FromSqlRow<ST, DB>,
 {
     type Row = Self;
 
@@ -20,8 +20,9 @@ where
     }
 }
 
-impl<DB: Backend, In, ST> FromSqlRow<ST, DB> for TaggedId<In>
+impl<T, DB, ST> FromSqlRow<ST, DB> for TaggedId<T>
 where
+    DB: Backend,
     String: FromSqlRow<ST, DB>,
 {
     fn build_from_row<T: Row<DB>>(row: &mut T) -> deserialize::Result<Self> {

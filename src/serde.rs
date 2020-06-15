@@ -1,6 +1,7 @@
 use use_serde::{de, Deserialize, Deserializer, Serialize, Serializer};
+use uuid::Uuid;
 
-use super::*;
+use super::TaggedId;
 
 impl<T> Serialize for TaggedId<T> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
