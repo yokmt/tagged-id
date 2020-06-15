@@ -25,7 +25,7 @@ where
     DB: Backend,
     String: FromSqlRow<ST, DB>,
 {
-    fn build_from_row<T: Row<DB>>(row: &mut T) -> deserialize::Result<Self> {
+    fn build_from_row<U: Row<DB>>(row: &mut U) -> deserialize::Result<Self> {
         let str = String::build_from_row(row)?;
         Ok(TaggedId::parse_str(&str)?)
     }
